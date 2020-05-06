@@ -1,4 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <strings.h>
+#include <string.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -43,7 +47,7 @@ int main(int argc, char const *argv[])
           (char *)&serv_addr.sin_addr.s_addr,
           server->h_length);
     serv_addr.sin_port = htons(portNo);
-    if (connect(socketFD, &serv_addr, sizeof(serv_addr)) < 0)
+    if (connect(socketFD, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
         error("Error connecting");
     }

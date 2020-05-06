@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <strings.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -54,7 +57,7 @@ int main(int argc, char const *argv[])
     }
     printf("Message: %s\n", buffer);
 
-    n = write(newSocketFD, "Message received");
+    n = write(newSocketFD, "Message received", 16);
     if (n < 0)
     {
         error("Error in writing to socket");
