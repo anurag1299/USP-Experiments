@@ -11,7 +11,7 @@
 void error(char *msg)
 {
     perror(msg);
-    exit(1);
+    exit(0);
 }
 
 int main(int argc, char const *argv[])
@@ -43,11 +43,11 @@ int main(int argc, char const *argv[])
 
     bzero((char *)&serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-    bcopy((char *)server->h_addr_list,
+    bcopy((char *)server->h_addr,
           (char *)&serv_addr.sin_addr.s_addr,
           server->h_length);
     serv_addr.sin_port = htons(portNo);
-    if (connect(socketFD, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    if (connect(socketFD, &serv_addr, sizeof(serv_addr)) < 0)
     {
         error("Error connecting");
     }

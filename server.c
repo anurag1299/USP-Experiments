@@ -12,9 +12,11 @@ void error(char *msg)
     exit(1);
 }
 
+void talkToClient(int, struct sockaddr_in);
+
 int main(int argc, char const *argv[])
 {
-    int socketFD, newSocketFD, portNo, clientLen, n;
+    int socketFD, newSocketFD, portNo, clientLen, n, pid;
     char buffer[256];
     struct sockaddr_in server_addr, client_addr;
 
@@ -43,25 +45,46 @@ int main(int argc, char const *argv[])
     listen(socketFD, 5);
 
     clientLen = sizeof(client_addr);
-    newSocketFD = accept(socketFD, (struct sockaddr *)&client_addr, &clientLen);
-    if (newSocketFD < 0)
+    while (1)
     {
-        error("Error in accepting");
+        newSocketFD = accept(socketFD, (struct sockaddr *)&client_addr, &clientLen);
+        if (newSocketFD < 0)
+        {
+            error("Error in accepting");
+        }
+        pid = fork();
+        if (pid < 0)
+        {
+            error("Error in fork");
+        }
+        if (pid == 0)
+        {
+            close(socketFD);
+            talkToClient(newSocketFD, client_addr);
+            exit(0);
+        }
+        else
+        {
+            close(newSocketFD);
+        }
     }
-
+    return 0;
+}
+void talkToClient(int newSocket, struct sockaddr_in client_addr)
+{
+    int n;
+    char buffer[256];
     bzero(buffer, 256);
-    n = read(newSocketFD, buffer, 256);
+    n = read(newSocket, buffer, 256);
     if (n < 0)
     {
         error("Error in reading from socket");
     }
-    printf("Message: %s\n", buffer);
+    printf("Message from %d: %s\n", client_addr.sin_addr.s_addr, buffer);
 
-    n = write(newSocketFD, "Message received", 16);
+    n = write(newSocket, "Message received", 16);
     if (n < 0)
     {
         error("Error in writing to socket");
     }
-
-    return 0;
 }
